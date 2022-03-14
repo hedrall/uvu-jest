@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "ttsc -p tsconfig.ttsc.json",
+    "test": "uj dist-uvu/tests"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "uvu-jest": "file:../..",
+    "uvu-jest-ts-plugin": "file:../../transformer"
+  }
+}

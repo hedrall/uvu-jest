@@ -1,0 +1,95 @@
+{
+  "name": "uvu-jest",
+  "version": "0.0.34",
+  "repository": "hedrall/uvu-jest",
+  "description": "Run the existing jest code with uvu",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "author": "hedrall",
+  "bin": {
+    "uj": "./dist/ts-bin.js"
+  },
+  "typesVersions": {
+    "*": {
+      ".": ["./dist/index.d.ts"],
+      "assert": ["./dist/ts-assert.d.ts"],
+      "jest-wrapper": ["./dist/jest-wrapper.d.ts"]
+    }
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./jest-wrapper": {
+      "require": "./dist/jest-wrapper.js",
+      "import": "./dist/jest-wrapper.js"
+    },
+    "./assert": {
+      "require": "./dist/ts-assert.js",
+      "import": "./dist/ts-assert.js"
+    },
+    "./diff": {
+      "require": "./diff/index.js",
+      "import": "./diff/index.mjs"
+    },
+    "./parse": {
+      "require": "./parse/index.js",
+      "import": "./parse/index.mjs"
+    },
+    "./run": {
+      "require": "./dist/run/ts-run.js",
+      "import": "./dist/run/ts-run.js"
+    }
+  },
+  "files": [
+    "*.js",
+    "*.d.ts",
+    "parse",
+    "diff",
+    "dist"
+  ],
+  "modes": {
+    "diff": "src/diff.js",
+    "parse": "src/parse.js"
+  },
+  "scripts": {
+    "build": "bundt && tsc",
+    "test": "node test"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [
+    "assert",
+    "diffs",
+    "runner",
+    "snapshot",
+    "test"
+  ],
+  "dependencies": {
+    "app-root-path": "^3.0.0",
+    "dequal": "^2.0.0",
+    "diff": "^5.0.0",
+    "kleur": "^4.0.3",
+    "sade": "^1.7.3"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.0.2",
+    "@types/node": "^17.0.14",
+    "bundt": "1.1.1",
+    "esbuild": "^0.14.16",
+    "esbuild-register": "^3.3.2",
+    "esm": "3.2.25",
+    "jest-snapshot": "^27.5.0",
+    "module-alias": "2.2.2",
+    "totalist": "2.0.0",
+    "ttypescript": "^1.5.13",
+    "typescript": "^4.5.5"
+  },
+  "_moduleAliases": {
+    "ts-uvu": "src/index.js"
+  }
+}

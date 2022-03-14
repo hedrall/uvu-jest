@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "plugins": [{"transform": "uvu-jest-ts-plugin"}],
+    "outDir": "dist-uvu",
+    "strict": true,
+    "allowJs": true,
+    "target": "esnext",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "alwaysStrict": true,
+    "module": "CommonJS",
+    "checkJs": false
+  },
+  "include": [
+    "tests",
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

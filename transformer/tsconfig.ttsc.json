@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "./jest-to-uvu.ts"
+//        "transform": "./dist/jest-to-uvu.js"
+      }
+    ],
+    "target": "es2016",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist-ttsc",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "source.spec.ts",
+    "source2.spec.ts",
+    "out.ts"
+  ]
+}

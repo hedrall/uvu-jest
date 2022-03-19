@@ -447,7 +447,7 @@ export async function exec ( bail: boolean ) {
 			results.push( result.result );
 
 			reportResults( result.result );
-			if ( typeof result.errorMessages === 'string' && result.errorMessages.length ) {
+			if ( result.errorMessages.toString() !== 'true' && result.errorMessages ) {
 				write( '\n' + result.errorMessages + '\n' );
 				exitCode = 1;
 				if ( bail ) return isNode && process.exit( 1 );

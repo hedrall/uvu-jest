@@ -228,7 +228,10 @@ async function runner ( ctx: Context, thisSuiteName: string, filename?: string, 
 				const suite = test;
 				// nested suite
 				const result = await suite.runSync( filename, [...suiteNameStack || [], thisSuiteName] );
-				res.errorMessages += result.errorMessages === true ? '' : result.errorMessages;
+				if (result.errorMessages !== true) {
+					if (res.errorMessages === true) res.errorMessages = '';
+					res.errorMessages += result.errorMessages;
+				}
 				res.count.test.passed += result.count.test.passed;
 				res.count.test.skipped += result.count.test.skipped;
 				res.count.test.errored += result.count.test.errored;

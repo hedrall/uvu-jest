@@ -1,6 +1,6 @@
 {
   "name": "uvu-jest",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "repository": "hedrall/uvu-jest",
   "description": "Run the existing jest code with uvu",
   "module": "dist/index.mjs",

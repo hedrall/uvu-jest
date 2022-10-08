@@ -1,7 +1,13 @@
-process.env.NODE_ENV = 'test';
+import { RunnerResponse, SuiteResult, TestResult } from './types';
 import kleur from 'kleur';
 import { compare } from '../diff';
 import { Assertion } from './ts-assert';
+import { FAILURE, FILE, reportErrorSuites, reportResult, SUITE } from './reporter';
+import { loadConfig } from './loadConfig';
+import * as fs from 'fs';
+const config = loadConfig();
+
+process.env.NODE_ENV = 'test';
 
 let isCLI = false, isNode = false;
 let hrtime = ( now = Date.now() ) => () => (Date.now() - now).toFixed( 2 ) + 'ms';
@@ -110,11 +116,7 @@ isCLI || globalThis.UVU_QUEUE.push( [null] );
 
 const QUOTE = kleur.dim( '"' ), GUTTER = '\n        ';
 const IGNORE = /^\s*at.*(?:\(|\s)(?:node|(internal\/[\w/]*))/;
-const FAILURE = kleur.bold().bgRed( ' FAIL ' );
 const SUCCESS = kleur.bold().bgGreen( ' SUCCESS ' );
-const FILE = kleur.bold().underline().white;
-const SUITE = kleur.bgWhite().bold;
-const TestResultIcon = ( result: boolean ) => result ? '✔' : '✘';
 
 function stack ( stack: string, idx: number ) {
 	let i = 0, line, out = '';
@@ -146,37 +148,6 @@ function format ( name: string, err: Error, suite = '' ) {
 	if ( !!~idx ) str += stack( err.stack as string, idx );
 	return str + '\n';
 }
-
-type TestResult = {
-	name: string,
-	result: boolean,
-	errorMessage?: string,
-};
-
-type SuiteResult = {
-	filename?: string;
-	childResults?: SuiteResult[];
-	suiteName: string;
-	suiteResult: boolean;
-	thisSuiteResult: boolean;
-	testResults: TestResult[];
-}
-
-type RunnerResponse = {
-	errorMessages: string | true,
-	count: {
-		test: {
-			passed: number,
-			skipped: number,
-			errored: number,
-		},
-		suite: {
-			passed: number,
-			errored: number,
-		},
-	}
-	result: SuiteResult
-};
 
 const executeWithErrorReporting = async ( fn: ( ...args: any[] ) => Promise<any> | any, where?: {
 	filename?: string,
@@ -364,60 +335,7 @@ function suiteFactory ( ctx: Context, name = '' ): Suite {
 export const suite = ( name = '', state = {} ) => suiteFactory( context( state ), name );
 export const test = suite();
 
-const reportResults = ( result: SuiteResult, depth: number = 1 ) => {
-	const { filename, suiteName, thisSuiteResult, testResults, childResults } = result;
-	if ( depth === 1 && filename ) {
-		console.group( '👾 Each Suite Result: ' );
-		console.log( FILE( filename ) );
-	}
-	console.group( SUITE( ` ${suiteName} ` ) );
-	testResults.forEach( ( { name, result } ) => {
-		console.log( (result ? kleur.green : kleur.red)(
-			`${TestResultIcon( result )} ${name}`
-		) );
-	} );
-	if ( childResults ) {
-		childResults.forEach( cr => reportResults( cr, depth + 1 ) );
-	}
-	console.groupEnd();
-	if ( depth === 1 ) {
-		console.groupEnd();
-	}
-}
-
 const results: SuiteResult[] = [];
-
-const reportErrorSuites = ( _result: SuiteResult | SuiteResult[] = results, resultStack: SuiteResult[] = [] ) => {
-	if ( Array.isArray( _result ) ) {
-		results.forEach( r => reportErrorSuites( r, resultStack ) );
-		return;
-	}
-	if ( !_result.thisSuiteResult ) {
-		if ( _result.filename ) {
-			console.group( FILE( _result.filename ) );
-		}
-		// report
-		const message = [
-			...resultStack
-				.map( r => (r.thisSuiteResult ? '' : FAILURE) + (SUITE( r.suiteName )) ),
-			FAILURE + SUITE( _result.suiteName )
-		].join( ' > ' );
-		console.group( message );
-		_result.testResults.forEach( ( { name, result } ) => {
-			console.log( (result ? kleur.green : kleur.red)(
-				`${TestResultIcon( result )} ${name}`
-			) );
-		} );
-		console.groupEnd();
-
-		if ( _result.filename ) {
-			console.groupEnd();
-		}
-	}
-	if ( _result.childResults ) {
-		_result.childResults.forEach( r => reportErrorSuites( r, [...resultStack, _result] ) );
-	}
-};
 
 export async function exec ( bail: boolean ) {
 	let timer = hrtime();
@@ -449,7 +367,7 @@ export async function exec ( bail: boolean ) {
 			counts.tests.total += result.count.test.passed + result.count.test.errored;
 			results.push( result.result );
 
-			reportResults( result.result );
+			reportResult( result.result );
 			if ( result.errorMessages.toString() !== 'true' && result.errorMessages ) {
 				write( '\n' + result.errorMessages + '\n' );
 				exitCode = 1;
@@ -479,9 +397,13 @@ export async function exec ( bail: boolean ) {
 
 	if ( counts.suite.errored > 0 ) {
 		console.group( '💥 Errored Tests' );
-		reportErrorSuites();
+		reportErrorSuites(results);
 		console.groupEnd();
 	}
 
+	const { emitResultPath}  = config.config;
+	if (emitResultPath) {
+		fs.writeFileSync(emitResultPath, JSON.stringify(results, null, 2));
+	}
 	if ( isNode ) process.exitCode = exitCode;
 }

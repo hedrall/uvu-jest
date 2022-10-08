@@ -42,6 +42,10 @@
     "./run": {
       "require": "./dist/run/ts-run.js",
       "import": "./dist/run/ts-run.js"
+    },
+    "./reporter": {
+      "require": "./dist/reporter.js",
+      "import": "./dist/reporter.js"
     }
   },
   "files": [

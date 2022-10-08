@@ -8,6 +8,7 @@ type Config = {
   setupFiles?: string[],
   snapshotResolver?: string,
   customMatchers?: string,
+	emitResultPath?: string,
 }
 
 type LoadConfigResult = {
@@ -15,7 +16,9 @@ type LoadConfigResult = {
   customMatchers?: Record<string, CallableFunction>;
   config: Config;
 }
+let _config: LoadConfigResult | null = null;
 export const loadConfig = (): LoadConfigResult => {
+	if (_config) return _config;
   let config: Config = {};
   const result: LoadConfigResult = {
     config: {}
@@ -53,5 +56,6 @@ export const loadConfig = (): LoadConfigResult => {
     }
   }
 
-  return result;
+  _config = result;
+	return _config;
 }

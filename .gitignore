@@ -17,3 +17,5 @@ transformer/dist*
 transformer/out.ts
 transformer/source*
 
+uvu-jest.config.js
+report.json
